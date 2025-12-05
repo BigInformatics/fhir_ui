@@ -1,0 +1,12 @@
+  medplum-app:
+    image: mp-fhir-app:latest
+    env_file:
+      - .env
+    restart: always
+    ports:
+      - '3000:3000'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000']
+      interval: 10s
+      timeout: 5s
+      retries: 5
