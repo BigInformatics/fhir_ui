@@ -1,3 +1,4 @@
+services:
   medplum-app:
     image: medplum/medplum-app:latest
     env_file:
