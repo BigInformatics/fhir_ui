@@ -1,7 +1,6 @@
 services:
   medplum-app:
-    build: .
-    image: mp-fhir-app:latest
+    image: ghcr.io/${{ github.repository }}:latest
     environment:
       - MEDPLUM_BASE_URL
       - MEDPLUM_CLIENT_ID
@@ -15,7 +14,7 @@ services:
     ports:
       - '8104:3000'
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:3000']
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:3000']
       interval: 10s
       timeout: 5s
       retries: 5
