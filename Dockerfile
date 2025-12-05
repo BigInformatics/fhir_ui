@@ -1,9 +1,16 @@
-FROM medplum/medplum-app:latest
+# Build stage
+FROM medplum/medplum-app:latest AS build
 
-# Only static ENV here if needed
-ENV NEXT_TELEMETRY_DISABLED=1
+# Runtime stage with nginx
+FROM nginx:alpine
 
-WORKDIR /usr/src/medplum
+# Copy built assets from medplum-app
+COPY --from=build /usr/share/nginx/html /usr/share/nginx/html
 
-EXPOSE 3000
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
+EXPOSE 80
+
+ENTRYPOINT ["/entrypoint.sh"]
