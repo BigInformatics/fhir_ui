@@ -1,6 +1,13 @@
 services:
   medplum-app:
     image: medplum/medplum-app:latest
+    environment:
+      - MEDPLUM_BASE_URL
+      - MEDPLUM_CLIENT_ID
+      - GOOGLE_CLIENT_ID
+      - RECAPTCHA_SITE_KEY
+      - MEDPLUM_REGISTER_ENABLED
+      - MEDPLUM_AWS_TEXTRACT_ENABLED
     env_file:
       - .env
     restart: always
