@@ -1,14 +1,6 @@
 #!/bin/sh
 set -e
 
-# Set default values for environment variables
-: "${MEDPLUM_BASE_URL:=http://localhost:8103}"
-: "${MEDPLUM_CLIENT_ID:=}"
-: "${GOOGLE_CLIENT_ID:=}"
-: "${RECAPTCHA_SITE_KEY:=6LeHZ94UAAAAAAvh7sFFa6DcXYXtlIqvMCPm3RGk}"
-: "${MEDPLUM_REGISTER_ENABLED:=true}"
-: "${MEDPLUM_AWS_TEXTRACT_ENABLED:=true}"
-
 echo "Configuring Medplum app..."
 echo "MEDPLUM_BASE_URL: ${MEDPLUM_BASE_URL}"
 
