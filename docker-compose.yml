@@ -1,5 +1,5 @@
   medplum-app:
-    image: mp-fhir-app:latest
+    image: medplum/medplum-app:latest
     env_file:
       - .env
     restart: always
