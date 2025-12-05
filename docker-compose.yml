@@ -1,6 +1,7 @@
 services:
   medplum-app:
-    image: medplum/medplum-app:latest
+    build: .
+    image: mp-fhir-app:latest
     environment:
       - MEDPLUM_BASE_URL
       - MEDPLUM_CLIENT_ID
