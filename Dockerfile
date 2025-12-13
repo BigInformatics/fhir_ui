@@ -7,7 +7,7 @@ WORKDIR /build
 RUN apk add --no-cache git && \
     git clone --depth 1 https://github.com/medplum/medplum.git .
 
-# Install dependencies and build the app
+# Build the app (uses .env.defaults with localhost:8103)
 RUN npm ci && \
     npm run build -- --filter=@medplum/app
 
@@ -15,22 +15,31 @@ RUN npm ci && \
 FROM caddy:2-alpine
 
 # Copy the built app
-COPY --from=build /build/packages/app/dist /usr/share/caddy
+COPY --from=build /build/packages/app/dist /usr/share/caddy/html
+
+# Copy Medplum's official entrypoint and adapt for Caddy
+COPY --from=build /build/packages/app/docker-entrypoint.sh /tmp/medplum-entrypoint.sh
+
+# Create our entrypoint that uses Medplum's logic but for Caddy
+RUN cat /tmp/medplum-entrypoint.sh | \
+    sed 's|/usr/share/nginx/html|/usr/share/caddy/html|g' | \
+    sed 's|exec nginx -g.*|exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile|g' \
+    > /docker-entrypoint.sh && \
+    chmod +x /docker-entrypoint.sh && \
+    rm /tmp/medplum-entrypoint.sh
 
 # Create Caddyfile
-RUN echo ':3000 {' > /etc/caddy/Caddyfile && \
-    echo '  root * /usr/share/caddy' >> /etc/caddy/Caddyfile && \
-    echo '  encode gzip' >> /etc/caddy/Caddyfile && \
-    echo '  file_server' >> /etc/caddy/Caddyfile && \
-    echo '  try_files {path} /index.html' >> /etc/caddy/Caddyfile && \
-    echo '  header /assets/* {' >> /etc/caddy/Caddyfile && \
-    echo '    Cache-Control "public, max-age=31536000, immutable"' >> /etc/caddy/Caddyfile && \
-    echo '  }' >> /etc/caddy/Caddyfile && \
-    echo '}' >> /etc/caddy/Caddyfile
-
-# Copy entrypoint script
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
+COPY <<EOF /etc/caddy/Caddyfile
+:3000 {
+  root * /usr/share/caddy/html
+  encode gzip
+  file_server
+  try_files {path} /index.html
+  header /assets/* {
+    Cache-Control "public, max-age=31536000, immutable"
+  }
+}
+EOF
 
 EXPOSE 3000
 
