@@ -47,7 +47,10 @@ The app will be available at `http://localhost:3000`
 
 ### Required Environment Variables (For the Medplum App)
 
-- `MEDPLUM_BASE_URL` - The base URL of your Medplum/FHIR server (e.g., `your-fhir-url-here`)
+- `MEDPLUM_BASE_URL` - The base URL of your Medplum/FHIR server
+  - **MUST include protocol (http:// or https://) AND trailing slash**
+  - Example: `https://fhir.example.com/`
+  - Example: `http://localhost:8103/`
 - `MEDPLUM_CLIENT_ID` - OAuth client ID for authentication
 
 ### Optional Environment Variables (For the Medplum App)
@@ -147,6 +150,15 @@ The service includes a health check that verifies Caddy is responding on port 30
 - Retries: 5
 
 ## Troubleshooting
+
+### Mixed content errors or malformed URLs (http://https//...)
+
+This indicates `MEDPLUM_BASE_URL` is not formatted correctly. Common mistakes:
+- ❌ `fhir.example.com` (missing protocol)
+- ❌ `https://fhir.example.com` (missing trailing slash)
+- ✅ `https://fhir.example.com/` (correct format)
+
+The Medplum client validates that the base URL starts with `http` and automatically ensures trailing slash.
 
 ### App connects to wrong server
 
