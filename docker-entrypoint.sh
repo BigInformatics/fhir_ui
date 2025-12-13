@@ -29,6 +29,7 @@ grep -r "localhost:8103" /usr/share/caddy/assets/ | head -3 || echo "No localhos
 
 find /usr/share/caddy/assets -type f -exec sed -i \
   -e "s|__MEDPLUM_BASE_URL__|${MEDPLUM_BASE_URL}|g" \
+  -e "s|baseUrl:\"http://localhost:8103/\"|baseUrl:\"${MEDPLUM_BASE_URL}\"|g" \
   -e "s|http://localhost:8103/|${MEDPLUM_BASE_URL}|g" \
   -e "s|http://localhost:8103|${MEDPLUM_BASE_URL}|g" \
   -e "s|localhost:8103/|${MEDPLUM_BASE_URL}|g" \
