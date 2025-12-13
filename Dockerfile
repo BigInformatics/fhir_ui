@@ -11,7 +11,6 @@ RUN apk add --no-cache git && \
 RUN echo 'MEDPLUM_BASE_URL=__MEDPLUM_BASE_URL__' > packages/app/.env && \
     echo 'MEDPLUM_CLIENT_ID=__MEDPLUM_CLIENT_ID__' >> packages/app/.env && \
     echo 'GOOGLE_CLIENT_ID=__GOOGLE_CLIENT_ID__' >> packages/app/.env && \
-    echo 'RECAPTCHA_SITE_KEY=__RECAPTCHA_SITE_KEY__' >> packages/app/.env && \
     echo 'MEDPLUM_REGISTER_ENABLED=__MEDPLUM_REGISTER_ENABLED__' >> packages/app/.env && \
     echo 'MEDPLUM_AWS_TEXTRACT_ENABLED=__MEDPLUM_AWS_TEXTRACT_ENABLED__' >> packages/app/.env
 
@@ -29,9 +28,11 @@ COPY --from=build /build/packages/app/dist /usr/share/caddy/html
 COPY --from=build /build/packages/app/docker-entrypoint.sh /tmp/medplum-entrypoint.sh
 
 # Create our entrypoint that uses Medplum's logic but for Caddy
+# Remove RECAPTCHA_SITE_KEY default value to allow disabling recaptcha
 RUN cat /tmp/medplum-entrypoint.sh | \
     sed 's|/usr/share/nginx/html|/usr/share/caddy/html|g' | \
-    sed 's|exec nginx -g.*|exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile|g' \
+    sed 's|exec nginx -g.*|exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile|g' | \
+    sed 's|: \${RECAPTCHA_SITE_KEY:="6LfHdsYdAAAAAC0uLnnRrDrhcXnziiUwKd8VtLNq"}|: ${RECAPTCHA_SITE_KEY:=""}|g' \
     > /docker-entrypoint.sh && \
     chmod +x /docker-entrypoint.sh && \
     rm /tmp/medplum-entrypoint.sh
