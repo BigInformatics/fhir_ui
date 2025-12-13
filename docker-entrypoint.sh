@@ -23,6 +23,10 @@ fi
 # Find all files in the assets directory and replace placeholders
 # This replaces BOTH the placeholder tokens AND the hardcoded localhost:8103 from build
 # Handle all variations: with/without protocol, with/without trailing slash
+# Also show what we're actually replacing for debugging
+echo "Searching for localhost:8103 in assets..."
+grep -r "localhost:8103" /usr/share/caddy/assets/ | head -3 || echo "No localhost:8103 found"
+
 find /usr/share/caddy/assets -type f -exec sed -i \
   -e "s|__MEDPLUM_BASE_URL__|${MEDPLUM_BASE_URL}|g" \
   -e "s|http://localhost:8103/|${MEDPLUM_BASE_URL}|g" \
@@ -35,6 +39,9 @@ find /usr/share/caddy/assets -type f -exec sed -i \
   -e "s|__MEDPLUM_REGISTER_ENABLED__|${MEDPLUM_REGISTER_ENABLED}|g" \
   -e "s|__MEDPLUM_AWS_TEXTRACT_ENABLED__|${MEDPLUM_AWS_TEXTRACT_ENABLED}|g" \
   {} \;
+
+echo "After replacement, checking for localhost:8103..."
+grep -r "localhost:8103" /usr/share/caddy/assets/ | head -3 || echo "Successfully replaced all localhost:8103 instances"
 
 echo "Configuration complete. Starting Caddy..."
 
