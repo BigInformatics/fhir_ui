@@ -8,10 +8,11 @@ RUN apk add --no-cache git && \
     git clone --depth 1 https://github.com/medplum/medplum.git .
 
 # Create .env with placeholder tokens (these will be replaced at runtime)
+# Use empty string for RECAPTCHA to disable it
 RUN echo 'MEDPLUM_BASE_URL=__MEDPLUM_BASE_URL__' > packages/app/.env && \
     echo 'MEDPLUM_CLIENT_ID=__MEDPLUM_CLIENT_ID__' >> packages/app/.env && \
     echo 'GOOGLE_CLIENT_ID=__GOOGLE_CLIENT_ID__' >> packages/app/.env && \
-    echo 'RECAPTCHA_SITE_KEY=__RECAPTCHA_SITE_KEY__' >> packages/app/.env && \
+    echo 'RECAPTCHA_SITE_KEY=' >> packages/app/.env && \
     echo 'MEDPLUM_REGISTER_ENABLED=__MEDPLUM_REGISTER_ENABLED__' >> packages/app/.env && \
     echo 'MEDPLUM_AWS_TEXTRACT_ENABLED=__MEDPLUM_AWS_TEXTRACT_ENABLED__' >> packages/app/.env
 
