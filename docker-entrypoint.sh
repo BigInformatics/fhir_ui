@@ -12,11 +12,23 @@ set -e
 echo "Configuring Medplum app..."
 echo "MEDPLUM_BASE_URL: ${MEDPLUM_BASE_URL}"
 
+# Validate MEDPLUM_BASE_URL format
+if [ -n "$MEDPLUM_BASE_URL" ] && ! echo "$MEDPLUM_BASE_URL" | grep -q "^http"; then
+  echo "ERROR: MEDPLUM_BASE_URL must start with http:// or https://"
+  echo "Current value: ${MEDPLUM_BASE_URL}"
+  echo "Example correct format: https://fhir.example.com/"
+  exit 1
+fi
+
 # Find all files in the assets directory and replace placeholders
 # This replaces BOTH the placeholder tokens AND the hardcoded localhost:8103 from build
+# Handle all variations: with/without protocol, with/without trailing slash
 find /usr/share/caddy/assets -type f -exec sed -i \
   -e "s|__MEDPLUM_BASE_URL__|${MEDPLUM_BASE_URL}|g" \
   -e "s|http://localhost:8103/|${MEDPLUM_BASE_URL}|g" \
+  -e "s|http://localhost:8103|${MEDPLUM_BASE_URL}|g" \
+  -e "s|localhost:8103/|${MEDPLUM_BASE_URL}|g" \
+  -e "s|localhost:8103|${MEDPLUM_BASE_URL}|g" \
   -e "s|__MEDPLUM_CLIENT_ID__|${MEDPLUM_CLIENT_ID}|g" \
   -e "s|__GOOGLE_CLIENT_ID__|${GOOGLE_CLIENT_ID}|g" \
   -e "s|__RECAPTCHA_SITE_KEY__|${RECAPTCHA_SITE_KEY}|g" \
